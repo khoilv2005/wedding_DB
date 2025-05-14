@@ -12,15 +12,7 @@ interface Logo {
 
 const allLogosData: Logo[] = [
   { id: 1, src: "/logo.jpg", alt: "Lotte Hotels & Resorts" },
-  { id: 2, src: "/logos/logo_m.png", alt: "Logo M" },
-  { id: 3, src: "/logos/lane.png", alt: "Lane" },
-  { id: 4, src: "/logos/the_anam.png", alt: "The Anam" },
-  { id: 5, src: "/logos/nam_nghi.png", alt: "Nam Nghi" },
-  { id: 6, src: "/logos/tuta.png", alt: "Tuta Makeup Academy" },
-  { id: 7, src: "/logos/jw_marriott.png", alt: "JW Marriott" },
-  { id: 8, src: "/logos/logo8.png", alt: "Logo Đối Tác 8" },
-  { id: 9, src: "/logos/logo9.png", alt: "Logo Đối Tác 9" },
-  { id: 10, src: "/logos/logo10.png", alt: "Logo Đối Tác 10" },
+
 ];
 
 interface LogoScrollerProps {

@@ -1,3 +1,4 @@
+"use client";
 import CallToActionSection from "./_components/contact";
 import WeddingWorksSection from "./_components/description1";
 import WeddingWorksSection2 from "./_components/description2";
@@ -8,10 +9,63 @@ import TestimonialSection from "./_components/review";
 import LogoScroller from "./_components/supporter";
 
 
+import { useEffect, useState } from "react";
+import BrandIntro from "./_components/introduce";
+import NewsSection from "./_components/news";
+
 export default function Home() {
+  const [introData, setIntroData] = useState<null | {
+    title: string;
+    leftImage: string;
+    rightImage: string;
+    leftFeatures: string[];
+    rightFeatures: string[];
+  }>(null);
+
+  useEffect(() => {
+    // Giả sử API trả về đúng cấu trúc
+    fetch("/api/admin/brand-intro")
+      .then((res) => res.json())
+      .then(setIntroData)
+      .catch(() => setIntroData(null));
+  }, []);
+
+  // Giá trị mặc định
+  const defaultIntroData = {
+    title: "Chúng tôi cung  các dịch vụ tổ chức sự kiện chuyên nghiệp, sáng tạo và tinh tế, giúp khách hàng tạo nên những khoảnh khắc đáng nhớ trong cuộc đời.",
+    leftImage: "/logo.jpg",
+    rightImage: "/logo.jpg",
+    leftFeatures: [
+      "Trải nghiệm thử váy AR miễn phí",
+      "Miễn phí điều chỉnh trang phục phù hợp"
+    ],
+    rightFeatures: [
+      "Miễn phí dịch vụ giao váy tận nơi, hỗ trợ thử váy",
+      "Bảo hiểm váy cưới lên đến 30 triệu - Bảo vệ toàn diện cho trang phục ngày trọng đại"
+    ]
+  };
+
+  // Nếu introData có dữ liệu thì lấy introData, còn không thì dùng mặc định
+  const data = introData ?? defaultIntroData;
+
   return (
-    <main> {/* Sử dụng main thay vì div cho ngữ nghĩa */}
+    <main>
       <div>
+        <BrandIntro
+          title={data.title}
+          leftImage={data.leftImage}
+          rightImage={data.rightImage}
+          leftFeatures={data.leftFeatures}
+          rightFeatures={data.rightFeatures}
+        />
+      </div>
+      <NewsSection />
+    </main>
+  );
+}
+
+
+{/* <div>
         <ImageCarousel />
       </div>
       <div className="relative z-10">
@@ -47,9 +101,4 @@ export default function Home() {
 
     <div>
       <CallToActionSection />
-    </div>
-
-
-    </main>
-  );
-}
+    </div> */}
