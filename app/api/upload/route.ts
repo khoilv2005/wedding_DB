@@ -28,9 +28,9 @@ export async function POST(request: NextRequest) {
     // Tạo mảng bytes từ file
     const bytes = await file.arrayBuffer();
     let buffer = Buffer.from(bytes); // Để TypeScript tự suy luận kiểu
-    let originalFilename = file.name;
-    let fileExtension = path.extname(originalFilename).toLowerCase();
-    let filenameWithoutExt = path.parse(originalFilename).name;
+    const originalFilename = file.name;
+    const fileExtension = path.extname(originalFilename).toLowerCase();
+    const filenameWithoutExt = path.parse(originalFilename).name;
     let savedFilename = originalFilename; // Tên file sẽ được lưu
     let savedFileExtension = fileExtension; // Đuôi file sẽ được lưu
 
