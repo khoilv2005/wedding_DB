@@ -10,32 +10,7 @@ const databaseUrl = "postgres://avnadmin:AVNS_NndJQN9mImhY7RcStmG@pg-15cf1a87-kh
 
 // Biến môi trường chứa nội dung chứng chỉ CA (vẫn giữ để code có thể dùng nếu biến này được thiết lập)
 // Tuy nhiên, với rejectUnauthorized: false, chứng chỉ này không bắt buộc để kết nối thành công.
-const caCert = `-----BEGIN CERTIFICATE-----
-MIIETTCCArWgAwIBAgIUIZmqMLoDgcrloNefS0gZ9ycL9P8wDQYJKoZIhvcNAQEM
-BQAwQDE+MDwGA1UEAww1NTdkMjRkZTYtZTY3OC00OTY4LWFiMWYtOTc5Yjg5ZDgx
-YmUyIEdFTiAxIFByb2plY3QgQ0EwHhcNMjUwNTA0MTc0ODU1WhcNMzUwNTAyMTc0
-ODU1WjBAMT4wPAYDVQQDDDU1N2QyNGRlNi1lNjc4LTQ5NjgtYWIxZi05NzliODlk
-ODFiZTIgR0VOIDEgUHJvamVjdCBDQTCCAaIwDQYJKoZIhvcNAQEBBQADggGPADCC
-AYoCggGBAK7eyaf87ZVWbP4UjjEXhtX5rog6FEw+pWjtmMV7zd7fvOnVA93O4yIY
-pHgR78rJn5TyyaDaiZCYhLYHtvOR3ohKQ6/c+5UhCy86kq09Tbb6U2RA2Q7K6hHo
-eHU0rVk58lGBdd7adagcXtMrgrEe1sUIWj/QamCEPBG0EtsG3g3ZnObxlv8CJUhA
-I0mmNrouMi9X1oqoy3qw/ac6Ok7dG4/eH+nWfcFjfBTGpfI8/vMUbXhYzdVJ1G2h
-NlJQjbvvTovTPSYDQ0UPbSsAiN2tYAn4rLY63+t1FK9h0S7G388BZwPnPOP+Mg+G
-4gMFyN6aap8DUrq4ORvjTekl7CmQ30i4jHHMqR37l/XeK/bAsOpR1scY3c6fpVKB
-B8rnBqUc+AadVV/1katEO1AVuCduUetN09pp0aQv9AmavfNRrTVMiIHiuUbZL6AA
-+iqADxFJKjlKoWQhfMbj948B1CX8NPOIh/K1rMz5ZgIddGyBiIiSJ+OtC6h5H86S
-nNsV4IMJJwIDAQABoz8wPTAdBgNVHQ4EFgQUXBBOBXBvKRtEbq5UTeuCRo9EWpMw
-DwYDVR0TBAgwBgEB/wIBADALBgNVHQ8EBAMCAQYwDQYJKoZIhvcNAQEMBQADggGB
-AD7QnAM9Ptmqvjm+0LMiBBPNe9UHNKqky86djAcw4fBw7tZuzQanX1b95azYWhVz
-xA6CUHDewQqsuIZC0iah603xPmIxIgcVwktPU2sWqgo09Qzz7xRw3DHaR2EyHlVv
-9SW6lnFWuvBgGk8SPluQLyHZnC2nQLqXEZSgzf7nmyeFfEbZFykNhcOI1TSbab56
-SMofQuvM0R0kyiu4AkUmwYwtheEMn7wsbTZiK6wglLUT3fAAuhhKdjkGCCyqSBMH
-bb+VeWksTVJGMbGGmuomcQsxbXPAyfqHytmcTiFchKj5iOfdMiHA+be7WKkY3ohv
-PsKScaRuLxqHdO9/QUyQnN0caq6+SmHMhOND9QWgcDJHD9P4jiIoLTndBczIBqmg
-Izt92HaEhYUfQNsY7AX+eZZF7sWTgcP53WdrIQdMdclogPnafi0WxqXVOj/J89Jk
-2hWAV0kw09MJ3TpOOZtFq8tsTuYDG0UQ+lUJ5ploIX1t3roHMh3cjAMwP3gOIC1G
-RA==
------END CERTIFICATE-----`;
+const caCert = process.env.DB_CERT; // Chứng chỉ CA (nếu có) từ biến môi trường
 
 // Cấu hình cho Pool kết nối
 const dbConfig = {
