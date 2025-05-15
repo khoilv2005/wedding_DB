@@ -1,4 +1,5 @@
 // components/FeedbackSection.js
+import Link from 'next/link';
 import styles from './FeedbackSection.module.css';
 
 const FeedbackSection = () => {
@@ -21,9 +22,10 @@ const FeedbackSection = () => {
       </div>
 
       <div className={styles.ctaContainer}>
-        <a href="/#news-section" className={styles.ctaButton}> {/* Replace /contact with your actual contact page path */}
-          Liên hệ đặt dịch vụ
-        </a>
+        <Link href="/#news-section" className={styles.ctaButton}>
+      {/* Nội dung bên trong thẻ a ban đầu, ví dụ: */}
+      Liên hệ đặt lịch tư vấn
+    </Link>
         {/* Optional: Add the smaller note text if needed, though it seems like a design note */}
         {/* <p className={styles.note}>Mấy cái thông tin này e tự điền</p> */}
       </div>
