@@ -1,33 +1,130 @@
 // app/api/settings/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import fs from 'fs/promises';
-import path from 'path';
+import { Pool } from 'pg'; // Sử dụng Pool từ thư viện pg
 
-// Đảm bảo đường dẫn này khớp với vị trí file settings.json của bạn
-// Nếu file ở gốc project:
-const settingsFilePath = path.join(process.cwd(), 'settings.json');
-// Nếu file ở cùng thư mục với route.ts:
-// const settingsFilePath = path.join(__dirname, 'settings.json');
+// --- CẤU HÌNH KẾT NỐI DATABASE (HARDCODED - KHÔNG AN TOÀN CHO PRODUCTION) ---
+// Chuỗi kết nối database PostgreSQL của bạn được đặt trực tiếp ở đây.
+// Vui lòng THAY THẾ CHUỖI NÀY bằng chuỗi kết nối THỰC TẾ của bạn.
+// Ví dụ: postgres://user:password@host:port/database?sslmode=require
+const databaseUrl = "postgres://avnadmin:AVNS_NndJQN9mImhY7RcStmG@pg-15cf1a87-khoakim09-f275.l.aivencloud.com:11586/defaultdb?sslmode=require";
+
+// Biến môi trường chứa nội dung chứng chỉ CA (vẫn giữ để code có thể dùng nếu biến này được thiết lập)
+// Tuy nhiên, với rejectUnauthorized: false, chứng chỉ này không bắt buộc để kết nối thành công.
+const caCert = `-----BEGIN CERTIFICATE-----
+MIIETTCCArWgAwIBAgIUIZmqMLoDgcrloNefS0gZ9ycL9P8wDQYJKoZIhvcNAQEM
+BQAwQDE+MDwGA1UEAww1NTdkMjRkZTYtZTY3OC00OTY4LWFiMWYtOTc5Yjg5ZDgx
+YmUyIEdFTiAxIFByb2plY3QgQ0EwHhcNMjUwNTA0MTc0ODU1WhcNMzUwNTAyMTc0
+ODU1WjBAMT4wPAYDVQQDDDU1N2QyNGRlNi1lNjc4LTQ5NjgtYWIxZi05NzliODlk
+ODFiZTIgR0VOIDEgUHJvamVjdCBDQTCCAaIwDQYJKoZIhvcNAQEBBQADggGPADCC
+AYoCggGBAK7eyaf87ZVWbP4UjjEXhtX5rog6FEw+pWjtmMV7zd7fvOnVA93O4yIY
+pHgR78rJn5TyyaDaiZCYhLYHtvOR3ohKQ6/c+5UhCy86kq09Tbb6U2RA2Q7K6hHo
+eHU0rVk58lGBdd7adagcXtMrgrEe1sUIWj/QamCEPBG0EtsG3g3ZnObxlv8CJUhA
+I0mmNrouMi9X1oqoy3qw/ac6Ok7dG4/eH+nWfcFjfBTGpfI8/vMUbXhYzdVJ1G2h
+NlJQjbvvTovTPSYDQ0UPbSsAiN2tYAn4rLY63+t1FK9h0S7G388BZwPnPOP+Mg+G
+4gMFyN6aap8DUrq4ORvjTekl7CmQ30i4jHHMqR37l/XeK/bAsOpR1scY3c6fpVKB
+B8rnBqUc+AadVV/1katEO1AVuCduUetN09pp0aQv9AmavfNRrTVMiIHiuUbZL6AA
++iqADxFJKjlKoWQhfMbj948B1CX8NPOIh/K1rMz5ZgIddGyBiIiSJ+OtC6h5H86S
+nNsV4IMJJwIDAQABoz8wPTAdBgNVHQ4EFgQUXBBOBXBvKRtEbq5UTeuCRo9EWpMw
+DwYDVR0TBAgwBgEB/wIBADALBgNVHQ8EBAMCAQYwDQYJKoZIhvcNAQEMBQADggGB
+AD7QnAM9Ptmqvjm+0LMiBBPNe9UHNKqky86djAcw4fBw7tZuzQanX1b95azYWhVz
+xA6CUHDewQqsuIZC0iah603xPmIxIgcVwktPU2sWqgo09Qzz7xRw3DHaR2EyHlVv
+9SW6lnFWuvBgGk8SPluQLyHZnC2nQLqXEZSgzf7nmyeFfEbZFykNhcOI1TSbab56
+SMofQuvM0R0kyiu4AkUmwYwtheEMn7wsbTZiK6wglLUT3fAAuhhKdjkGCCyqSBMH
+bb+VeWksTVJGMbGGmuomcQsxbXPAyfqHytmcTiFchKj5iOfdMiHA+be7WKkY3ohv
+PsKScaRuLxqHdO9/QUyQnN0caq6+SmHMhOND9QWgcDJHD9P4jiIoLTndBczIBqmg
+Izt92HaEhYUfQNsY7AX+eZZF7sWTgcP53WdrIQdMdclogPnafi0WxqXVOj/J89Jk
+2hWAV0kw09MJ3TpOOZtFq8tsTuYDG0UQ+lUJ5ploIX1t3roHMh3cjAMwP3gOIC1G
+RA==
+-----END CERTIFICATE-----`;
+
+// Cấu hình cho Pool kết nối
+const dbConfig = {
+  connectionString: databaseUrl, // Sử dụng chuỗi kết nối hardcoded
+  // Cấu hình SSL
+  ssl: {
+    // Đặt rejectUnauthorized: false để bỏ qua lỗi xác thực chứng chỉ (KHÔNG AN TOÀN)
+    // Chỉ sử dụng cho mục đích học tập/debug.
+    rejectUnauthorized: false,
+    // Cung cấp chứng chỉ CA nếu có (từ biến môi trường DB_CERT)
+    // Mặc dù rejectUnauthorized là false, cung cấp CA vẫn là tốt hơn nếu có thể.
+    ca: caCert,
+  },
+};
+// ---------------------------------------------------------------------------
+
+// Sử dụng Pool bên ngoài handler để tái sử dụng kết nối
+let pool: Pool | null = null;
+
+function getDbPool(): Pool {
+    if (pool === null) {
+        // Kiểm tra xem chuỗi kết nối hardcoded có giá trị không
+        if (!dbConfig.connectionString) {
+            console.error("Database connection string is missing (hardcoded value is empty)!");
+            throw new Error("Database connection string is missing.");
+        }
+        // Lưu ý: Kiểm tra chứng chỉ CA trong production nếu rejectUnauthorized được bật
+        // Trong code này, rejectUnauthorized là false, nên kiểm tra này sẽ không gây lỗi.
+        // if (process.env.NODE_ENV === 'production' && dbConfig.ssl?.rejectUnauthorized && !dbConfig.ssl?.ca) {
+        //      console.error("DB_CERT environment variable is not set in production!");
+        //      throw new Error("Database CA certificate is missing in production.");
+        // }
+
+
+        pool = new Pool(dbConfig);
+        console.log("PostgreSQL connection pool created.");
+    }
+    return pool;
+}
 
 
 // =========================================================================
-// API Đọc cài đặt (GET /api/settings) - Giữ nguyên hoặc dùng code đã sửa ENOENT
+// API Đọc cài đặt (GET /api/settings)
 // =========================================================================
 export async function GET() {
-  // ... (Code hàm GET ở đây) ...
-  // Sử dụng code GET đã hoạt động và sửa lỗi ENOENT đầy đủ
+  let client; // Sử dụng client khi lấy từ pool
+
   try {
-    const fileContent = await fs.readFile(settingsFilePath, 'utf8');
-    const settings = JSON.parse(fileContent);
-    return NextResponse.json(settings);
-  } catch (error: any) {
-    if (error.code === 'ENOENT') {
-      console.warn(`Settings file not found at ${settingsFilePath}. Returning full default settings.`);
-      const defaultSettings = { intro: "Nội dung giới thiệu mặc định khi file không tồn tại", otherSetting: "Giá trị mặc định khác" }; // Thêm các biến mặc định khác
+    const dbPool = getDbPool(); // Lấy pool kết nối
+    client = await dbPool.connect(); // Lấy một client từ pool
+
+    // Thực thi câu lệnh SELECT để lấy dòng cài đặt duy nhất (WHERE id = 1)
+    const result = await client.query('SELECT * FROM settings WHERE id = 1 LIMIT 1');
+
+    if (result.rows.length === 0) {
+      // Trường hợp bảng settings chưa có dòng id = 1 (chưa chạy INSERT ban đầu)
+      console.warn("Settings row (id=1) not found in database. Returning default settings.");
+      const defaultSettings = {
+          intro: "Nội dung giới thiệu mặc định",
+          name: "Tên SP mặc định",
+          cost: "Giá mặc định",
+          description: "Mô tả mặc định",
+          conceptText1: "Concept 1 mặc định",
+          conceptText2: "Concept 2 mặc định",
+          conceptText3: "Concept 3 mặc định"
+      };
       return NextResponse.json(defaultSettings);
     }
-    console.error('Failed to load settings:', error);
+
+    // Lấy dòng đầu tiên (và duy nhất)
+    const settings = result.rows[0]; // pg trả về rows là mảng object
+
+    // Trả về object cài đặt
+    return NextResponse.json(settings);
+
+  } catch (error: any) {
+    console.error('Failed to fetch settings from database:', error);
+    // Log thêm chi tiết lỗi SSL nếu có
+    if (error.code === 'SELF_SIGNED_CERT_IN_CHAIN' || error.code === 'DEPTH_ZERO_SELF_SIGNED_CERT') {
+        console.error("SSL Certificate Error Details:", error.message);
+        console.error("Consider using Environment Variables for connection string and CA certificate in production.");
+    }
     return NextResponse.json({ message: 'Failed to load settings', error: error.message }, { status: 500 });
+  } finally {
+    // Rất quan trọng: Giải phóng client trở lại vào pool
+    if (client) {
+      client.release();
+      console.log("PostgreSQL client released.");
+    }
   }
 }
 
@@ -37,8 +134,10 @@ export async function GET() {
 // =========================================================================
 export async function POST(request: NextRequest) {
   // !!! CẢNH BÁO BẢO MẬT: KHÔNG CÓ XÁC THỰC ADMIN !!!
-  // Bất kỳ ai cũng có thể gọi API này để thay đổi file settings.json.
-  // KHÔNG DÙNG TRONG MÔI TRƯỜNG THỰC TẾ MÀ CHƯA CÓ BẢO MẬT.
+  // Cần thêm logic xác thực admin ở đây!
+  // ...
+
+  let client;
 
   try {
     // 1. Đọc dữ liệu cài đặt MỚI từ body của request
@@ -48,43 +147,95 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ message: 'Invalid data format. Expected a JSON object.' }, { status: 400 });
     }
 
-    let settings: any; // Sử dụng any cho đơn giản nếu không dùng interface Settings
+    const dbPool = getDbPool();
+    client = await dbPool.connect();
 
-    try {
-      // 2. Đọc nội dung file cài đặt HIỆN TẠI
-      const fileContent = await fs.readFile(settingsFilePath, 'utf8');
-      settings = JSON.parse(fileContent);
-    } catch (readError: any) {
-       if (readError.code === 'ENOENT') {
-         // Nếu file chưa tồn tại, bắt đầu với object rỗng hoặc mặc định
-         console.warn(`Settings file not found. Starting with empty settings or initial defaults.`);
-         settings = {}; // Bắt đầu với object rỗng
-       } else {
-         console.error('Failed to read settings file before update:', readError);
-         return NextResponse.json({ message: 'Failed to read settings before update', error: readError.message }, { status: 500 });
-       }
+    // 2. Xây dựng câu lệnh UPDATE và giá trị
+    const updatableColumns = ['intro', 'name', 'cost', 'description', 'conceptText1', 'conceptText2', 'conceptText3']; // Liệt kê TẤT CẢ các cột có thể sửa từ form Admin
+    const columnsToSet: string[] = [];
+    const values: any[] = [];
+    let valueIndex = 1; // Index cho placeholder ($1, $2, ...)
+
+    // Lọc chỉ các cột hợp lệ có trong dữ liệu nhận được
+    for (const column of updatableColumns) {
+        if (newSettingsData.hasOwnProperty(column)) {
+            columnsToSet.push(`${column} = $${valueIndex}`);
+            values.push(newSettingsData[column]);
+            valueIndex++;
+        }
     }
 
-    // 3. Gộp dữ liệu MỚI nhận được vào object cài đặt HIỆN TẠI
-    Object.assign(settings, newSettingsData);
+    // Nếu không có cột nào hợp lệ để cập nhật
+    if (columnsToSet.length === 0) {
+         return NextResponse.json({ message: 'No valid settings provided for update' }, { status: 400 });
+    }
 
-    // 4. Chuyển object đã cập nhật thành chuỗi JSON
-    const updatedContent = JSON.stringify(settings, null, 2);
+    // --- CÁCH DÙNG INSERT ... ON CONFLICT ... DO UPDATE cho PostgreSQL (Tốt hơn) ---
+    // Xây dựng câu lệnh SQL INSERT ... ON CONFLICT ... DO UPDATE
+    const insertColumns = ['id', ...updatableColumns];
+    const insertPlaceholders = insertColumns.map((_, i) => `$${i + 1}`).join(', ');
+    const updateClauses = updatableColumns.map(col => `${col} = EXCLUDED.${col}`).join(', '); // EXCLUDED.column_name lấy giá trị từ phần INSERT
 
-    // 5. Ghi chuỗi JSON đã cập nhật trở lại vào file
-    await fs.writeFile(settingsFilePath, updatedContent, 'utf8');
+    // Tạo mảng giá trị cho INSERT, bao gồm id=1 và giá trị cho các cột cập nhật
+    // Đảm bảo thứ tự giá trị khớp với insertColumns
+    const insertValues = [1, ...updatableColumns.map(col => newSettingsData.hasOwnProperty(col) ? newSettingsData[col] : null)]; // Điền giá trị hoặc null cho các cột được liệt kê
 
-    // 6. Trả về phản hồi thành công
-    return NextResponse.json({ message: 'Settings updated successfully', settings: settings });
+    const upsertSql = `
+        INSERT INTO settings (${insertColumns.join(', ')})
+        VALUES (${insertPlaceholders})
+        ON CONFLICT (id) DO UPDATE
+        SET ${updateClauses};
+    `;
+
+    // Thực thi câu lệnh SQL
+    const result = await client.query(upsertSql, insertValues);
+
+    // console.log("Upsert result:", result); // Log kết quả thực thi SQL
+
+
+    // 3. Đọc lại cài đặt sau khi lưu để trả về (tùy chọn)
+    const updatedResult = await client.query('SELECT * FROM settings WHERE id = 1 LIMIT 1');
+    const updatedSettings: any = updatedResult.rows.length > 0 ? updatedResult.rows[0] : {};
+
+
+    // 4. Trả về phản hồi thành công
+    return NextResponse.json({ message: 'Settings updated successfully', settings: updatedSettings });
 
   } catch (error: any) {
-    console.error('Failed to update settings:', error);
+    console.error('Failed to update settings in database:', error);
+    // Log thêm chi tiết lỗi SSL nếu có
+     if (error.code === 'SELF_SIGNED_CERT_IN_CHAIN' || error.code === 'DEPTH_ZERO_SELF_SIGNED_CERT') {
+        console.error("SSL Certificate Error Details:", error.message);
+        console.error("Consider using Environment Variables for connection string and CA certificate in production.");
+    }
     return NextResponse.json({ message: 'Failed to update settings', error: error.message }, { status: 500 });
+  } finally {
+    // Rất quan trọng: Giải phóng client trở lại vào pool
+    if (client) {
+      client.release();
+      console.log("PostgreSQL client released.");
+    }
   }
 }
 
 // Interface Settings (có thể để ở đây hoặc file riêng)
+// Cần đảm bảo khớp với các cột trong bảng DB
 // interface Settings {
-//   intro: string;
+//   id?: number;
+//   intro?: string | null;
+//   name?: string | null;
+//   cost?: string | null;
+//   description?: string | null;
+//   conceptText1?: string | null;
+//   conceptText2?: string | null;
+//   conceptText3?: string | null;
+//   created_at?: Date | string;
+//   updated_at?: Date | string;
 //   [key: string]: any;
+// }
+
+// Hàm placeholder checkUserIsAdmin - BẠN PHẢI TỰ TRIỂN KHAI
+// function checkUserIsAdmin(request: NextRequest): boolean {
+//   // Logic kiểm tra quyền admin ở đây
+//   return false;
 // }

@@ -12,9 +12,9 @@ interface Settings {
   name?: string;
   cost?: string;
   description?: string;
-  conceptText1?: string; // Biến mới cho "Tự điển nd 1"
-  conceptText2?: string; // Biến mới cho "Tự điển nd 2"
-  conceptText3?: string; // Biến mới cho "Tự điển nd 3"
+  concepttext1?: string; // Biến mới cho "Tự điển nd 1"
+  concepttext2?: string; // Biến mới cho "Tự điển nd 2"
+  concepttext3?: string; // Biến mới cho "Tự điển nd 3"
   [key: string]: any; // Cho phép các cài đặt khác
 }
 
@@ -67,9 +67,9 @@ const ConceptLayout = () => {
               "Đang tải..."
             ) : settingsError ? (
               "Lỗi tải nội dung"
-            ) : fetchedSettings && fetchedSettings.conceptText1 ? (
+            ) : fetchedSettings && fetchedSettings.concepttext1 ? (
               // Hiển thị nội dung nếu tải thành công và biến 'conceptText1' tồn tại
-              fetchedSettings.conceptText1
+              fetchedSettings.concepttext1
             ) : (
               // Trường hợp tải xong nhưng không có dữ liệu conceptText1
               "Nội dung 1 chưa cập nhật"
@@ -90,11 +90,11 @@ const ConceptLayout = () => {
               "Đang tải..."
             ) : settingsError ? (
               "Lỗi tải nội dung"
-            ) : fetchedSettings && fetchedSettings.conceptText2 ? (
-              // Hiển thị nội dung nếu tải thành công và biến 'conceptText2' tồn tại
-              fetchedSettings.conceptText2
+            ) : fetchedSettings && fetchedSettings.concepttext2 ? (
+              // Hiển thị nội dung nếu tải thành công và biến 'concepttext2' tồn tại
+              fetchedSettings.concepttext2
             ) : (
-              // Trường hợp tải xong nhưng không có dữ liệu conceptText2
+              // Trường hợp tải xong nhưng không có dữ liệu concepttext2
               "Nội dung 2 chưa cập nhật"
             )}
           </h2>
@@ -111,11 +111,11 @@ const ConceptLayout = () => {
               "Đang tải..."
             ) : settingsError ? (
               "Lỗi tải nội dung"
-            ) : fetchedSettings && fetchedSettings.conceptText3 ? (
-              // Hiển thị nội dung nếu tải thành công và biến 'conceptText3' tồn tại
-              fetchedSettings.conceptText3
+            ) : fetchedSettings && fetchedSettings.concepttext3 ? (
+              // Hiển thị nội dung nếu tải thành công và biến 'concepttext3' tồn tại
+              fetchedSettings.concepttext3
             ) : (
-              // Trường hợp tải xong nhưng không có dữ liệu conceptText3
+              // Trường hợp tải xong nhưng không có dữ liệu concepttext3
               "Nội dung 3 chưa cập nhật"
             )}
           </h2>
