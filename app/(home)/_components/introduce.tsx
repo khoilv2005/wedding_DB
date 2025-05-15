@@ -11,8 +11,8 @@ interface BrandIntroProps {
 
 const BrandIntro: React.FC<BrandIntroProps> = ({
   title = "Chúng tôi cung  các dịch vụ tổ chức sự kiện chuyên nghiệp, sáng tạo và tinh tế, giúp khách hàng tạo nên những khoảnh khắc đáng nhớ trong cuộc đời.",
-  leftImage = "/default-left.jpg",
-  rightImage = "/default-right.jpg",
+  leftImage = "/uploads/left-home.jpg",
+  rightImage = "/uploads/right-home.jpg",
   leftFeatures = [
     "Trải nghiệm thử váy AR miễn phí",
     "Miễn phí điều chỉnh trang phục phù hợp"

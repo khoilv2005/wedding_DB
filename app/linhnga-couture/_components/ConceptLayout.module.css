@@ -1,0 +1,68 @@
+/* components/ConceptLayout.module.css */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px; /* Khoảng cách giữa hàng trên và hàng dưới */
+  padding: 20px; /* Khoảng padding xung quanh container */
+}
+
+.topRow,
+.bottomRow {
+  display: flex;
+  justify-content: space-around; /* Căn đều các item */
+  align-items: center;
+  gap: 20px; /* Khoảng cách giữa các item trong cùng một hàng */
+}
+
+.imageWrapper {
+  width: 600px; /* Tăng chiều rộng lên gấp đôi (từ 300px) */
+  height: 400px; /* Tăng chiều cao lên gấp đôi (từ 200px) */
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #ccc; /* Giữ viền cho ảnh nếu bạn muốn */
+}
+
+.imageWrapperCentered {
+  width: 600px; /* Tăng chiều rộng lên gấp đôi (từ 300px) */
+  height: 400px; /* Tăng chiều cao lên gấp đôi (từ 200px) */
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #ccc; /* Giữ viền cho ảnh nếu bạn muốn */
+}
+
+.textBlock {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* border: 1px solid #ccc; */ /* <-- Bỏ dòng này để loại bỏ viền */
+  padding: 20px;
+  text-align: center;
+}
+
+/* Chỉnh font-size cho H2 bên trong textBlock */
+.textBlock h2 {
+  font-size: 1em; /* Giảm kích thước font cho H2 (1em tương đương kích thước font mặc định của parent) */
+}
+
+
+/* Điều chỉnh responsive nếu cần */
+@media (max-width: 1200px) {
+  .topRow,
+  .bottomRow {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .imageWrapper,
+  .imageWrapperCentered,
+  .textBlock {
+      width: 100%;
+      height: auto;
+  }
+
+  .textBlock h2 {
+      font-size: 1.2em;
+  }
+}

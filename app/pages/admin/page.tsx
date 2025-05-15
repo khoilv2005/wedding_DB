@@ -1,7 +1,11 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
+// Link và FaPhone không được sử dụng trong AdminPage, có thể bỏ import nếu không cần
+// import Link from 'next/link';
+// import { FaPhone } from 'react-icons/fa';
 
+// Interface cho dữ liệu NewsItem (giữ nguyên)
 interface NewsItem {
   id: string;
   title: string;
@@ -9,20 +13,95 @@ interface NewsItem {
   createdAt: string;
 }
 
+// Interface cho dữ liệu cài đặt nhận được từ API /api/settings
+// Cập nhật interface để bao gồm tất cả các biến cần quản lý
+interface Settings {
+  intro: string; // Đảm bảo key 'intro' tồn tại
+  // hotline?: string; // Đã bỏ hotline
+  // email_lien_he?: string; // Đã bỏ email_lien_he
+  name?: string; // Thêm biến name (cho ProductDetail hoặc cài đặt chung)
+  cost?: string; // Thêm biến cost (cho ProductDetail hoặc cài đặt chung)
+  description?: string; // Thêm biến description (cho ProductDetail hoặc cài đặt chung)
+  conceptText1?: string; // Thêm biến conceptText1
+  conceptText2?: string; // Thêm biến concept2
+  conceptText3?: string; // Thêm biến concept3
+  [key: string]: any; // Cho phép các cài đặt khác
+}
+
+
 export default function AdminPage() {
+  // State hiện có cho phần quản lý hình ảnh
   const [newsItems, setNewsItems] = useState<NewsItem[]>([]);
   const [file, setFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
-  const [messageType, setMessageType] = useState<'success' | 'error'>('success');
+  const [loading, setLoading] = useState(false); // Loading cho upload hình ảnh
+  const [message, setMessage] = useState(''); // Message cho upload hình ảnh
+  const [messageType, setMessageType] = useState<'success' | 'error'>('success'); // Message type cho upload hình ảnh
 
-  // Tải danh sách khi trang được render
+  // --- STATE MỚI CHO PHẦN QUẢN LÝ CÀI ĐẶT ---
+  // settings: lưu cài đặt gốc đọc từ API
+  const [settings, setSettings] = useState<Settings | null>(null);
+  // settingsForm: lưu dữ liệu đang chỉnh sửa trong form
+  // Khởi tạo với các giá trị mặc định hoặc rỗng cho tất cả các biến cần quản lý
+  const [settingsForm, setSettingsForm] = useState<Settings>({
+    intro: '',
+    // hotline: '', // Đã bỏ hotline
+    // email_lien_he: '', // Đã bỏ email_lien_he
+    name: '',
+    cost: '',
+    description: '',
+    conceptText1: '', // Khởi tạo biến mới
+    conceptText2: '', // Khởi tạo biến mới
+    conceptText3: ''  // Khởi tạo biến mới
+  });
+  const [loadingSettings, setLoadingSettings] = useState(true); // Loading khi tải cài đặt ban đầu
+  const [savingSettings, setSavingSettings] = useState(false); // Loading khi lưu cài đặt
+  const [settingsMessage, setSettingsMessage] = useState(''); // Message cho thao tác cài đặt
+  const [settingsMessageType, setSettingsMessageType] = useState<'success' | 'error'>('success'); // Message type cho cài đặt
+  const [settingsError, setSettingsError] = useState<string | null>(null); // Lỗi khi tải cài đặt
+  // ------------------------------------------
+
+
+  // Tải danh sách hình ảnh khi trang được render (giữ nguyên)
   useEffect(() => {
     fetchNews();
   }, []);
 
-  // Lấy dữ liệu từ localStorage
+  // --- useEffect MỚI để tải cài đặt khi trang được render ---
+  useEffect(() => {
+    setLoadingSettings(true);
+    setSettingsMessage(''); // Xóa thông báo cũ
+    setSettingsError(null); // Reset lỗi tải cài đặt
+
+    fetch('/api/settings') // Gọi API Đọc cài đặt (App Router)
+      .then(res => {
+        if (!res.ok) {
+          // Nếu API trả về lỗi (ví dụ: 500), vẫn cố gắng parse JSON để lấy thông báo lỗi
+          return res.json().then(err => { throw new Error(err.message || `HTTP error! status: ${res.status}`); });
+        }
+        return res.json();
+      })
+      .then((data: Settings) => {
+        setSettings(data); // Lưu cài đặt gốc
+        // Điền dữ liệu vào form, sử dụng dữ liệu nhận được
+        setSettingsForm(prev => ({
+           ...prev, // Giữ lại các giá trị mặc định ban đầu nếu data không có key đó
+           ...data // Ghi đè bằng dữ liệu từ API
+        }));
+      })
+      .catch(error => {
+        console.error('Lỗi khi tải cài đặt:', error);
+        setSettingsError('Lỗi khi tải cài đặt.'); // Lưu thông báo lỗi tải
+        setSettingsMessage(''); // Xóa thông báo thành công/lỗi lưu cũ
+        setSettings(null); // Đảm bảo state gốc là null nếu có lỗi
+      })
+      .finally(() => {
+        setLoadingSettings(false);
+      });
+  }, []); // Chỉ chạy một lần khi component mount
+
+
+  // Lấy dữ liệu hình ảnh từ localStorage (giữ nguyên)
   const fetchNews = () => {
     try {
       const savedNews = localStorage.getItem('newsItems');
@@ -30,19 +109,27 @@ export default function AdminPage() {
         setNewsItems(JSON.parse(savedNews));
       }
     } catch (error) {
-      console.error('Lỗi khi tải dữ liệu:', error);
+      console.error('Lỗi khi tải dữ liệu hình ảnh:', error);
       showMessage('Lỗi khi tải danh sách hình ảnh', 'error');
     }
   };
 
-  // Hiển thị thông báo
+  // Hiển thị thông báo cho upload hình ảnh (giữ nguyên)
   const showMessage = (msg: string, type: 'success' | 'error') => {
     setMessage(msg);
     setMessageType(type);
     setTimeout(() => setMessage(''), 5000);
   };
 
-  // Xử lý khi chọn file
+  // --- Hiển thị thông báo cho cài đặt ---
+  const showSettingsMessage = (msg: string, type: 'success' | 'error') => {
+    setSettingsMessage(msg);
+    setSettingsMessageType(type);
+    setTimeout(() => setSettingsMessage(''), 5000);
+  };
+
+
+  // Xử lý khi chọn file (giữ nguyên)
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
@@ -51,7 +138,7 @@ export default function AdminPage() {
     }
   };
 
-  // Xử lý khi submit form
+  // Xử lý khi submit form upload (giữ nguyên)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -64,23 +151,20 @@ export default function AdminPage() {
     setMessage('');
 
     try {
-      // Kiểm tra xem file đã tồn tại trong danh sách chưa
       const existingItem = newsItems.find(item => item.title === file.name);
       const isOverwriting = !!existingItem;
 
-      // Tạo FormData
       const formData = new FormData();
       formData.append('file', file);
 
-      console.log("Sending request to API...");
+      console.log("Sending request to API /api/upload...");
       const response = await fetch('/api/upload', {
         method: 'POST',
         body: formData,
       });
 
       console.log("Response status:", response.status);
-      
-      // Kiểm tra nếu response không phải JSON
+
       const contentType = response.headers.get('content-type');
       if (!contentType || !contentType.includes('application/json')) {
         console.error('Invalid content type:', contentType);
@@ -96,25 +180,22 @@ export default function AdminPage() {
         throw new Error(result.message || 'Upload thất bại');
       }
 
-      // Lưu thông tin với tên file gốc
       const fileTitle = result.file.name;
-      
+
       let updatedNews: NewsItem[];
-      
+
       if (isOverwriting) {
-        // Cập nhật item hiện có nếu đang ghi đè
         updatedNews = newsItems.map(item => {
           if (item.title === fileTitle) {
             return {
               ...item,
-              imageUrl: `${result.file.url}?v=${Date.now()}`, // Thêm timestamp để tránh cache
+              imageUrl: `${result.file.url}?v=${Date.now()}`,
               createdAt: new Date().toISOString()
             };
           }
           return item;
         });
       } else {
-        // Thêm mới nếu không phải ghi đè
         const newItem: NewsItem = {
           id: Date.now().toString(),
           title: fileTitle,
@@ -124,20 +205,18 @@ export default function AdminPage() {
         updatedNews = [...newsItems, newItem];
       }
 
-      // Cập nhật danh sách và lưu vào localStorage
       setNewsItems(updatedNews);
       localStorage.setItem('newsItems', JSON.stringify(updatedNews));
 
-      // Reset form
       setFile(null);
       setImagePreview(null);
       const fileInput = document.getElementById('fileInput') as HTMLInputElement;
       if (fileInput) fileInput.value = '';
 
-      const messageText = isOverwriting 
+      const messageText = isOverwriting
         ? `Đã cập nhật hình ảnh "${fileTitle}" thành công!`
         : `Đã thêm hình ảnh "${fileTitle}" thành công!`;
-      
+
       showMessage(messageText, 'success');
     } catch (error: any) {
       console.error('Upload error:', error);
@@ -147,7 +226,7 @@ export default function AdminPage() {
     }
   };
 
-  // Xử lý xóa hình ảnh
+  // Xử lý xóa hình ảnh (giữ nguyên)
   const handleDelete = (id: string) => {
     if (window.confirm('Bạn có chắc chắn muốn xóa hình ảnh này?')) {
       try {
@@ -162,11 +241,203 @@ export default function AdminPage() {
     }
   };
 
+  // --- HANDLER CHO FORM CHỈNH SỬA CÀI ĐẶT ---
+  const handleSettingsFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setSettingsForm(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSaveSettings = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    setSavingSettings(true);
+    setSettingsMessage(''); // Xóa thông báo cũ
+
+    try {
+      console.log("Sending request to API /api/settings (POST) to save settings...");
+      const response = await fetch('/api/settings', { // <-- Gọi API Ghi cài đặt App Router
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          // !!! THÊM HEADER XÁC THỰC ADMIN NẾU BẠN TRIỂN KHAI BẢO MẬT !!!
+          // 'Authorization': `Bearer ${adminToken}`,
+        },
+        body: JSON.stringify(settingsForm), // Gửi dữ liệu từ form
+      });
+
+      console.log("Response status:", response.status);
+
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        console.error('Invalid content type:', contentType);
+        const text = await response.text();
+        console.error('Response text:', text);
+        throw new Error('Server không trả về JSON');
+      }
+
+      const result = await response.json();
+      console.log("Response data:", result);
+
+      // Kiểm tra status code thành công (ví dụ: 200 OK) hoặc API trả về success: true
+      if (response.status !== 200) {
+         throw new Error(result.message || `Lỗi khi lưu cài đặt (Status: ${response.status})`);
+      }
+
+      // Cập nhật state settings chính sau khi lưu thành công
+      setSettings(result.settings); // API POST trả về cài đặt đã lưu
+
+      showSettingsMessage('Đã lưu cài đặt thành công!', 'success');
+
+    } catch (error: any) {
+      console.error('Save settings error:', error);
+      showSettingsMessage(error.message || 'Lỗi khi lưu cài đặt', 'error');
+      setSettingsMessageType('error');
+    } finally {
+      setSavingSettings(false);
+    }
+  };
+  // -----------------------------------------------------
+
+
   return (
     <div className="min-h-screen bg-gray-100 p-4">
       <div className="max-w-6xl mx-auto">
         <h1 className="text-3xl font-bold mb-6 text-center">TRANG QUẢN TRỊ</h1>
 
+        {/* --- PHẦN QUẢN LÝ CÀI ĐẶT MỚI --- */}
+        <div className="bg-white p-6 rounded-lg shadow-md mb-8">
+          <h2 className="text-xl font-semibold mb-4">Chỉnh sửa Cài đặt Website</h2>
+
+          {loadingSettings ? (
+            <p className="text-center text-gray-500">Đang tải cài đặt...</p>
+          ) : settingsError ? ( // Hiển thị lỗi tải cài đặt nếu có
+             <div className="p-3 rounded bg-red-100 text-red-700">
+                 {settingsError}
+             </div>
+          ) : (
+            <form onSubmit={handleSaveSettings}>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4"> {/* Dùng grid 2 cột trên md trở lên */}
+                {/* Input cho biến 'intro' */}
+                <div>
+                  <label htmlFor="intro" className="block mb-2 font-medium">Nội dung giới thiệu:</label>
+                  <textarea
+                    id="intro"
+                    name="intro"
+                    rows={4}
+                    value={settingsForm.intro || ''} // Sử dụng || '' để tránh undefined
+                    onChange={handleSettingsFormChange}
+                    className="w-full border rounded p-2"
+                  />
+                </div>
+
+                 {/* Input cho biến 'name' (Tên sản phẩm/Website/...) */}
+                 <div>
+                   <label htmlFor="name" className="block mb-2 font-medium">Tên (SP/Web):</label>
+                   <input
+                     id="name"
+                     name="name"
+                     type="text"
+                     value={settingsForm.name || ''}
+                     onChange={handleSettingsFormChange}
+                     className="w-full border rounded p-2"
+                   />
+                 </div>
+
+                 {/* Input cho biến 'cost' (Giá SP/...) */}
+                 <div>
+                   <label htmlFor="cost" className="block mb-2 font-medium">Giá (SP/...):</label>
+                   <input
+                     id="cost"
+                     name="cost"
+                     type="text" // Có thể dùng text để nhập cả ký hiệu tiền tệ
+                     value={settingsForm.cost || ''}
+                     onChange={handleSettingsFormChange}
+                     className="w-full border rounded p-2"
+                   />
+                 </div>
+
+                 {/* Input cho biến 'description' (Mô tả SP/...) */}
+                 <div>
+                   <label htmlFor="description" className="block mb-2 font-medium">Mô tả (SP/...):</label>
+                   <textarea
+                     id="description"
+                     name="description"
+                     rows={4}
+                     value={settingsForm.description || ''}
+                     onChange={handleSettingsFormChange}
+                     className="w-full border rounded p-2"
+                   />
+                 </div>
+
+                 {/* Input cho biến 'conceptText1' */}
+                 <div>
+                   <label htmlFor="conceptText1" className="block mb-2 font-medium">Nội dung Concept 1:</label>
+                   <textarea
+                     id="conceptText1"
+                     name="conceptText1"
+                     rows={3}
+                     value={settingsForm.conceptText1 || ''}
+                     onChange={handleSettingsFormChange}
+                     className="w-full border rounded p-2"
+                   />
+                 </div>
+
+                 {/* Input cho biến 'conceptText2' */}
+                 <div>
+                   <label htmlFor="conceptText2" className="block mb-2 font-medium">Nội dung Concept 2:</label>
+                   <textarea
+                     id="conceptText2"
+                     name="conceptText2"
+                     rows={3}
+                     value={settingsForm.conceptText2 || ''}
+                     onChange={handleSettingsFormChange}
+                     className="w-full border rounded p-2"
+                   />
+                 </div>
+
+                 {/* Input cho biến 'conceptText3' */}
+                 <div>
+                   <label htmlFor="conceptText3" className="block mb-2 font-medium">Nội dung Concept 3:</label>
+                   <textarea
+                     id="conceptText3"
+                     name="conceptText3"
+                     rows={3}
+                     value={settingsForm.conceptText3 || ''}
+                     onChange={handleSettingsFormChange}
+                     className="w-full border rounded p-2"
+                   />
+                 </div>
+
+
+              </div>
+
+              {settingsMessage && (
+                <div className={`p-3 mt-4 rounded ${
+                  settingsMessageType === 'error' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'
+                }`}>
+                  {settingsMessage}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={savingSettings}
+                className={`${
+                  savingSettings ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'
+                } text-white py-2 px-6 rounded-lg transition-colors mt-4`}
+              >
+                {savingSettings ? 'Đang lưu...' : 'Lưu Cài đặt'}
+              </button>
+            </form>
+          )}
+        </div>
+        {/* --------------------------------- */}
+
+
+        {/* Phần quản lý hình ảnh (Giữ nguyên code của bạn) */}
         <div className="bg-white p-6 rounded-lg shadow-md mb-8">
           <h2 className="text-xl font-semibold mb-4">Thêm hình ảnh mới</h2>
 

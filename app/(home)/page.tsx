@@ -33,8 +33,6 @@ export default function Home() {
   // Giá trị mặc định
   const defaultIntroData = {
     title: "Chúng tôi cung  các dịch vụ tổ chức sự kiện chuyên nghiệp, sáng tạo và tinh tế, giúp khách hàng tạo nên những khoảnh khắc đáng nhớ trong cuộc đời.",
-    leftImage: "/logo.jpg",
-    rightImage: "/logo.jpg",
     leftFeatures: [
       "Trải nghiệm thử váy AR miễn phí",
       "Miễn phí điều chỉnh trang phục phù hợp"
@@ -53,8 +51,6 @@ export default function Home() {
       <div>
         <BrandIntro
           title={data.title}
-          leftImage={data.leftImage}
-          rightImage={data.rightImage}
           leftFeatures={data.leftFeatures}
           rightFeatures={data.rightFeatures}
         />

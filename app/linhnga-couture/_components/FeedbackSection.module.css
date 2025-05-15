@@ -1,0 +1,105 @@
+/* components/FeedbackSection.module.css */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Căn giữa theo chiều ngang */
+  gap: 30px; /* Khoảng cách giữa danh sách feedback và CTA */
+  padding: 40px 20px; /* Padding trên dưới và hai bên */
+}
+
+.feedbackList {
+  display: flex;
+  flex-direction: column;
+  gap: 20px; /* Khoảng cách giữa các item feedback */
+  width: 100%;
+  max-width: 600px; /* Giới hạn chiều rộng tối đa của danh sách feedback */
+}
+
+.feedbackItem {
+  background-color: #fff; /* Nền trắng hoặc màu khác */
+  border: 1px solid #000; /* Viền đen như trong ảnh */
+  border-radius: 25px; /* Bo góc */
+  padding: 15px 25px; /* Padding bên trong */
+  text-align: center;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2); /* Đổ bóng nhẹ nếu muốn */
+}
+
+.feedbackItem p {
+    margin: 0; /* Bỏ margin mặc định của thẻ p */
+    font-size: 1em; /* Kích thước chữ */
+    color: #333; /* Màu chữ */
+}
+
+.ctaContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px; /* Khoảng cách với phần trên */
+}
+
+.ctaButton {
+  display: inline-block; /* Để có thể đặt padding và margin */
+  background-color: #e0e0e0; /* Màu nền nút (màu xám nhạt như bubble) */
+  color: #333; /* Màu chữ */
+  text-decoration: none; /* Bỏ gạch chân mặc định của link */
+  padding: 15px 30px; /* Padding bên trong nút */
+  border-radius: 25px; /* Bo góc nút */
+  font-size: 1.1em; /* Kích thước chữ nút */
+  font-weight: bold;
+  transition: background-color 0.3s ease; /* Hiệu ứng hover */
+  /* Tạo hình dạng giống bubble cho nút */
+  position: relative;
+}
+
+/* Tùy chỉnh hình dạng bubble cho CTA Button (đuôi bubble) */
+.ctaButton::after {
+  content: '';
+  position: absolute;
+  bottom: -10px; /* Vị trí đuôi bubble */
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+  width: 20px; /* Kích thước đuôi */
+  height: 20px; /* Kích thước đuôi */
+  background-color: #e0e0e0; /* Cùng màu nền nút */
+  /* border-bottom: 1px solid #000; */ /* Có thể thêm viền cho đuôi nếu muốn */
+  /* border-right: 1px solid #000; */
+}
+
+
+.ctaButton:hover {
+  background-color: #d0d0d0; /* Đổi màu khi hover */
+}
+
+/* Accessibility class to hide elements visually but keep them for screen readers */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .feedbackList {
+    max-width: 100%; /* Cho phép danh sách feedback chiếm toàn bộ chiều rộng */
+  }
+
+  .feedbackItem {
+    padding: 12px 20px; /* Giảm padding trên màn hình nhỏ */
+  }
+
+  .feedbackItem p {
+      font-size: 0.9em;
+  }
+
+  .ctaButton {
+    padding: 12px 25px; /* Giảm padding nút trên màn hình nhỏ */
+    font-size: 1em;
+  }
+}

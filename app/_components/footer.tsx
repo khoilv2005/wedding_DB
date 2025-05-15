@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 // Import các icon từ react-icons
-import { FaInstagram, FaFacebookF, FaPinterestP } from 'react-icons/fa';
+import { FaInstagram, FaFacebookF, FaPinterestP, FaYoutube, FaTiktok } from 'react-icons/fa';
 
 interface FooterLink {
   href: string;
@@ -33,36 +33,37 @@ const footerData: {
     { href: "https://instagram.com", icon: <FaInstagram />, label: "Instagram" },
     { href: "https://facebook.com", icon: <FaFacebookF />, label: "Facebook" },
     { href: "https://pinterest.com", icon: <FaPinterestP />, label: "Pinterest" },
+    { href: "https://youtube.com", icon: <FaYoutube />, label: "YouTube" },
+    { href: "https://tiktok.com", icon: <FaTiktok />, label: "TikTok" },
   ],
   contactInfo: [
-    "+ 84 967 884 766",
-    "info@theplannersvn.com",
-    "Hanoi: 2nd floor, 1C Dang Thai Than,",
-    "Hoan Kiem.",
+    "+ 84 896954852",
+    "info@DBWedding@gmail.com",
+    "TP Ho Ch Minh: 130 Cao Lỗ, Phường 4, Quận 8"
   ],
   columns: [
     {
       links: [
         { href: "/about", label: "ABOUT" },
         { href: "/our-works", label: "OUR WORKS" },
-        { href: "/wedding-works", label: "Wedding Works" },
-        { href: "/styling-decoration", label: "Styling & Decoration" },
+        { href: "#", label: "VENDORS" },
+        { href: "/blog", label: "BLOG" },
+        { href: "/contact", label: "CONTACT" },
       ],
     },
     {
       title: "OUR SERVICES",
       links: [
-        { href: "/services/wedding-planning", label: "Wedding Planning" },
-        { href: "/services/destination-wedding", label: "Destination Wedding" },
-        { href: "/services/styling-decoration", label: "Styling & Decoration" },
+        { href: "#", label: "Thuê váy cưới" },
+        { href: "#", label: "Trang trí và phong cách cưới" },
+        { href: "#", label: "Trải nghiệm AR/VR" },
       ],
     },
     {
       links: [
-        { href: "/press-praise", label: "PRESS & PRAISE" },
-        { href: "/blog", label: "BLOG" },
-        { href: "/contact", label: "CONTACT" },
         { href: "/faq", label: "FAQ" },
+        { href: "/privacy-policy", label: "Chính sách bảo mật" },
+        { href: "/terms-of-service", label: "Điều khoản dịch vụ" },
       ],
     },
   ],
@@ -118,24 +119,31 @@ const Footer: React.FC = () => {
           <div className="md:col-span-8 lg:col-span-7 grid grid-cols-2 sm:grid-cols-3 gap-8">
             {/* Cột 1: ABOUT, OUR WORKS (và các link con) */}
             <div>
-              <Link href={footerData.columns[0].links[0].href} legacyBehavior>
+              <Link href="#" legacyBehavior>
                 <a className="block text-sm font-semibold text-black uppercase mb-3 hover:text-gray-700">
                   {footerData.columns[0].links[0].label}
                 </a>
               </Link>
-              <Link href={footerData.columns[0].links[1].href} legacyBehavior>
+              <Link href="#" legacyBehavior>
                 <a className="block text-sm font-semibold text-black uppercase mb-3 hover:text-gray-700">
                   {footerData.columns[0].links[1].label}
                 </a>
               </Link>
-              <ul className="space-y-2">
-                <li>
-                  <Link href={footerData.columns[0].links[2].href} legacyBehavior><a className="text-sm hover:underline text-gray-600">{footerData.columns[0].links[2].label}</a></Link>
-                </li>
-                <li>
-                  <Link href={footerData.columns[0].links[3].href} legacyBehavior><a className="text-sm hover:underline text-gray-600">{footerData.columns[0].links[3].label}</a></Link>
-                </li>
-              </ul>
+              <Link href="#" legacyBehavior>
+                <a className="block text-sm font-semibold text-black uppercase mb-3 hover:text-gray-700">
+                  {footerData.columns[0].links[2].label}
+                </a>
+              </Link>
+              <Link href="#" legacyBehavior>
+                <a className="block text-sm font-semibold text-black uppercase mb-3 hover:text-gray-700">
+                  {footerData.columns[0].links[3].label}
+                </a>
+              </Link>
+              <Link href="#" legacyBehavior>
+                <a className="block text-sm font-semibold text-black uppercase mb-3 hover:text-gray-700">
+                  {footerData.columns[0].links[4].label}
+                </a>
+              </Link>
             </div>
 
             {/* Cột 2: OUR SERVICES (và các link con) */}
@@ -152,7 +160,7 @@ const Footer: React.FC = () => {
               </ul>
             </div>
 
-            {/* Cột 3: PRESS & PRAISE, BLOG, CONTACT, FAQ */}
+            {/* Cột 3: FAQ, Chính sách bảo mật, Điều khoản dịch vụ */}
             <div>
               {footerData.columns[2].links.map((link) => (
                 <Link key={link.label} href={link.href} legacyBehavior>
