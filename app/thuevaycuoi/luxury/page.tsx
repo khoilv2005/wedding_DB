@@ -11,7 +11,7 @@ const Luxury = () => {
                     <div className="h-[600px] w-full">
                         <Link href="/thuevaycuoi/luxury/linh-nga" className="h-full w-full block">
                             <Image
-                                src="/uploads/thue-vay-cuoi-luxury-anh1.jpg"
+                                src="/uploads/anh1.jpg"
                                 alt="Váy cưới luxury 1"
                                 width={400}
                                 height={600}
@@ -28,7 +28,7 @@ const Luxury = () => {
                     {/* Container ảnh thứ hai với chiều cao cố định */}
                     <div className="h-[600px] w-full">
                         <Image
-                            src="/uploads/thue-vay-cuoi-luxury-anh2.jpg"
+                            src="/uploads/andrea.jpg"
                             alt="Váy cưới luxury 2"
                             width={400}
                             height={600}
@@ -43,7 +43,7 @@ const Luxury = () => {
                     {/* Container ảnh thứ ba với chiều cao cố định */}
                     <div className="h-[600px] w-full">
                         <Image
-                            src="/uploads/thue-vay-cuoi-luxury-anh2.jpg"
+                            src="/uploads/nicole.jpg"
                             alt="Váy cưới luxury 3"
                             width={400}
                             height={600}

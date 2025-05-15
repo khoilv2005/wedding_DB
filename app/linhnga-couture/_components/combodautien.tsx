@@ -1,129 +1,75 @@
-"use client"; // Thêm directive này nếu sử dụng App Router
-import React, { useState, useEffect } from 'react'; // Import useState và useEffect
+import React from 'react';
 import Image from 'next/image';
-import styles from './ConceptLayout.module.css'; // Import CSS Module
+import styles from './MyComponent.module.css';
 
-// Interface cho dữ liệu cài đặt nhận được từ API /api/settings
-// Thêm các biến mới cho nội dung concept
-interface Settings {
-  intro: string;
-  hotline?: string;
-  email_lien_he?: string;
-  name?: string;
-  cost?: string;
-  description?: string;
-  concepttext1?: string; // Biến mới cho "Tự điển nd 1"
-  concepttext2?: string; // Biến mới cho "Tự điển nd 2"
-  concepttext3?: string; // Biến mới cho "Tự điển nd 3"
-  [key: string]: any; // Cho phép các cài đặt khác
-}
-
-const ConceptLayout = () => {
-  // --- THÊM STATE MỚI CHO CÀI ĐẶT TỪ API ---
-  const [fetchedSettings, setFetchedSettings] = useState<Settings | null>(null);
-  const [loadingSettings, setLoadingSettings] = useState(true); // Bắt đầu là true vì sẽ fetch ngay
-  const [settingsError, setSettingsError] = useState<string | null>(null);
-  // ----------------------------------------
-
-  // --- useEffect để fetch cài đặt từ API /api/settings ---
-  useEffect(() => {
-    setLoadingSettings(true); // Bắt đầu trạng thái tải cài đặt
-    setSettingsError(null); // Reset lỗi trước khi fetch
-
-    fetch("/api/settings") // <-- Gọi API Đọc cài đặt của bạn
-      .then((res) => {
-        if (!res.ok) {
-          // Xử lý nếu phản hồi không thành công (ví dụ: 404, 500)
-          throw new Error(`HTTP error! status: ${res.status}`);
-        }
-        return res.json(); // Parse phản hồi sang JSON
-      })
-      .then((data: Settings) => { // Ép kiểu dữ liệu nhận được sang Settings
-        setFetchedSettings(data); // Lưu toàn bộ object cài đặt vào state
-      })
-      .catch((error) => {
-        console.error("Failed to fetch settings:", error);
-        setSettingsError("Không thể tải nội dung concept."); // Lưu thông báo lỗi
-        setFetchedSettings(null); // Đảm bảo state là null nếu có lỗi
-      })
-      .finally(() => {
-        setLoadingSettings(false); // Kết thúc trạng thái tải
-      });
-
-  }, []); // Mảng dependencies rỗng: effect chỉ chạy 1 lần sau render đầu tiên
-
-
+const LinNgaShowcase: React.FC = () => {
   return (
     <div className={styles.container}>
-      <div className={styles.topRow}>
-        <div className={styles.imageWrapper}>
-          {/* Replace with your image path */}
-          <Image src="/uploads/linhnga1.jpg" alt="Top Left Image" layout="fill" objectFit="cover" />
+      {/* Header */}
+
+
+      {/* Top Section */}
+      <div className={styles.section}>
+        {/* Image 1 */}
+        <div className={styles.imageContainer}>
+          <Image 
+            src="/uploads/linhnga1.jpg" 
+            alt="Linh Nga Wedding Collection" 
+            width={400}
+            height={500}
+            className={styles.image}
+          />
         </div>
-        <div className={styles.textBlock}>
-          {/* --- HIỂN THỊ NỘI DUNG CONCEPT 1 TỪ STATE (LẤY TỪ API) --- */}
-          <h2>
-            {loadingSettings ? (
-              "Đang tải..."
-            ) : settingsError ? (
-              "Lỗi tải nội dung"
-            ) : fetchedSettings && fetchedSettings.concepttext1 ? (
-              // Hiển thị nội dung nếu tải thành công và biến 'conceptText1' tồn tại
-              fetchedSettings.concepttext1
-            ) : (
-              // Trường hợp tải xong nhưng không có dữ liệu conceptText1
-              "Nội dung 1 chưa cập nhật"
-            )}
-          </h2>
-          {/* ---------------------------------------------------------- */}
+
+        {/* Content 1 */}
+        <div className={styles.content}>
+          <p>
+            Linh Nga là một thương hiệu cao cấp chuyên về thiết kế váy cưới và váy dạ hội, phục vụ cho thị trường trong nước lẫn quốc tế, nằm trong top 3 thương hiệu hàng đầu tại Việt Nam, được thành lập bởi NTK Linh Nga vào cuối năm 2014. Linh Nga có 2 showroom tại Hà Nội, Thành phố Hồ Chí Minh, mở đại diện độc quyền đầu tiên tại Texas, Hoa Kỳ. Tính đến thời điểm hiện tại, Linh Nga đã có 21 văn phòng đại diện tại các tỉnh thành phố lớn của Trung Quốc.
+          </p>
         </div>
-        <div className={styles.imageWrapper}>
-          {/* Replace with your image path */}
-          <Image src="/uploads/linhnga2.jpg" alt="Top Right Image" layout="fill" objectFit="cover" />
+
+        {/* Image 2 */}
+        <div className={styles.imageContainer}>
+          <Image 
+            src="/uploads/linhnga2.jpg" 
+            alt="Linh Nga Designer Collection" 
+            width={400}
+            height={500}
+            className={styles.image}
+          />
         </div>
       </div>
-      <div className={styles.bottomRow}>
-        <div className={styles.textBlock}>
-           {/* --- HIỂN THỊ NỘI DUNG CONCEPT 2 TỪ STATE (LẤY TỪ API) --- */}
-          <h2>
-             {loadingSettings ? (
-              "Đang tải..."
-            ) : settingsError ? (
-              "Lỗi tải nội dung"
-            ) : fetchedSettings && fetchedSettings.concepttext2 ? (
-              // Hiển thị nội dung nếu tải thành công và biến 'concepttext2' tồn tại
-              fetchedSettings.concepttext2
-            ) : (
-              // Trường hợp tải xong nhưng không có dữ liệu concepttext2
-              "Nội dung 2 chưa cập nhật"
-            )}
-          </h2>
-           {/* ---------------------------------------------------------- */}
+
+      {/* Bottom Section */}
+      <div className={styles.section}>
+        {/* Content 2 */}
+        <div className={styles.content}>
+          <p>
+            Năm 2023, LINH NGA COUTURE đã thành công vượt ngoài mong đợi khi giới thiệu các thiết kế độc quyền của mình tại TRUNK SHOW tổ chức tại Houston, Texas, đánh dấu bước đầu tiên trong hành trình chinh phục thị trường Mỹ và Anh. Chúng tôi cũng có cơ hội tham gia triển lãm thương mại tại Tuần lễ Thời trang Thượng Hải và vừa đi ra mắt cùng những bộ sưu tập Another Sunrise tại Tuần lễ Thời trang Sanya ở Trung Quốc.
+          </p>
         </div>
-        <div className={styles.imageWrapperCentered}>
-           {/* Replace with your image path */}
-           <Image src="/uploads/linhnga3.jpg" alt="Bottom Center Image" layout="fill" objectFit="cover" />
+
+        {/* Image 3 - Logo */}
+        <div className={styles.centerLogoContainer}>
+          <Image 
+            src="/uploads/linhnga3.jpg" 
+            alt="LINHNGA Logo" 
+            width={350}
+            height={500}
+            className={styles.centerLogo}
+            priority
+          />
         </div>
-        <div className={styles.textBlock}>
-           {/* --- HIỂN THỊ NỘI DUNG CONCEPT 3 TỪ STATE (LẤY TỪ API) --- */}
-          <h2>
-             {loadingSettings ? (
-              "Đang tải..."
-            ) : settingsError ? (
-              "Lỗi tải nội dung"
-            ) : fetchedSettings && fetchedSettings.concepttext3 ? (
-              // Hiển thị nội dung nếu tải thành công và biến 'concepttext3' tồn tại
-              fetchedSettings.concepttext3
-            ) : (
-              // Trường hợp tải xong nhưng không có dữ liệu concepttext3
-              "Nội dung 3 chưa cập nhật"
-            )}
-          </h2>
-           {/* ---------------------------------------------------------- */}
+
+        {/* Content 3 */}
+        <div className={styles.content}>
+          <p>
+            Với phong cách đặc trưng là sự ngọt ngào nữ tính kết hợp với vẻ thanh lịch tinh tế, những thiết kế của Linh Nga được nổi tiếng tại công tí mị mang về đẹp vượt thời gian. Chính yếu tố đó, đã thu hút những gương mặt nổi tiếng đình đám tại Trung Quốc lựa chọn Linh Nga để đồng hành như người đẹp - diễn viên Cúc Tịnh Y, nữ diễn viên Chúc Tự Đan, ca sĩ Trương Lương Dĩnh, ca sĩ Chung Hân Đồng (TWINS), ca sĩ Trương Tử Ninh, KOL Lưu Giai Tỷ và KOL Lai Mỹ Vân.
+          </p>
         </div>
       </div>
     </div>
   );
 };
 
-export default ConceptLayout;
+export default LinNgaShowcase;

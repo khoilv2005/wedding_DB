@@ -17,7 +17,7 @@ interface Settings {
 
 const ProductDetail = () => {
   // State để lưu hình ảnh được chọn (giữ nguyên)
-  const [selectedImage, setSelectedImage] = useState('/uploads/vay-cuoi-luxury-1.jpg');
+  const [selectedImage, setSelectedImage] = useState('/uploads/vay-cuoi-linhnga-1.jpg');
 
   // Mảng hình ảnh sản phẩm (giữ nguyên)
   const productImages = [

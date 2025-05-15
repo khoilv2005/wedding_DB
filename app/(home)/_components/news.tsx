@@ -32,9 +32,9 @@ const NewsSection: React.FC<NewsSectionProps> = ({
   // Giữ lại các state và router gốc của bạn
   const router = useRouter();
   const [news, setNews] = useState<NewsItem[]>([
-    { id: 1, imageUrl: "/upload/news1.jpg" },
-    { id: 2, imageUrl: "/upload/news2.jpg" },
-    { id: 3, imageUrl: "/upload/news3.jpg" },
+    { id: 1, imageUrl: "/uploads/news1.jpg" },
+    { id: 2, imageUrl: "/uploads/news2.jpg" },
+    { id: 3, imageUrl: "/uploads/news3.jpg" },
   ]);
   // Giữ lại state loading cho tin tức (nếu fetch API /api/admin/news hoạt động)
   const [loadingNews, setLoadingNews] = useState(false); // Đổi tên để phân biệt loading tin tức và loading cài đặt
@@ -98,9 +98,9 @@ const NewsSection: React.FC<NewsSectionProps> = ({
            // Sử dụng dữ liệu giả nếu API không trả về mảng hoặc trả về mảng rỗng
            console.warn("API /api/admin/news did not return news data. Using mock data.");
            setNews([
-             { id: 1, imageUrl: "/upload/news1.jpg" },
-             { id: 2, imageUrl: "/upload/news2.jpg" },
-             { id: 3, imageUrl: "/upload/news3.jpg" },
+             { id: 1, imageUrl: "/uploads/news1.jpg" },
+             { id: 2, imageUrl: "/uploads/news2.jpg" },
+             { id: 3, imageUrl: "/uploads/news3.jpg" },
            ]);
         }
       })
@@ -109,9 +109,9 @@ const NewsSection: React.FC<NewsSectionProps> = ({
         console.error("Failed to fetch news:", err);
         // Sử dụng dữ liệu giả nếu fetch lỗi
         setNews([
-          { id: 1, imageUrl: "/upload/news1.jpg" },
-          { id: 2, imageUrl: "/upload/news2.jpg" },
-          { id: 3, imageUrl: "/upload/news3.jpg" },
+          { id: 1, imageUrl: "/uploads/news1.jpg" },
+          { id: 2, imageUrl: "/uploads/news2.jpg" },
+          { id: 3, imageUrl: "/uploads/news3.jpg" },
         ]);
       })
       .finally(() => setLoadingNews(false));
